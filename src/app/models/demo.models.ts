@@ -55,6 +55,11 @@ export interface BatchEnrollResponse {
   failures: FailedEnrollment[];
 }
 
+export interface DemoEnrollmentResetResponse {
+  removedCount: number;
+  message: string;
+}
+
 export interface EnrollmentIntent {
   studentId: number;
   courseId: number;

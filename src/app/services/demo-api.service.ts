@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import {
   BatchEnrollResponse,
   CourseSummary,
+  DemoEnrollmentResetResponse,
   EnrollmentRequest,
   StudentProfile,
   StudentSummary
@@ -56,6 +57,10 @@ export class DemoApiService {
 
   batchEnroll(enrollments: EnrollmentRequest[]): Observable<BatchEnrollResponse> {
     return this.http.post<BatchEnrollResponse>(`${this.baseUrl}/enrollments/batch`, enrollments);
+  }
+
+  resetDemoEnrollments(): Observable<DemoEnrollmentResetResponse> {
+    return this.http.post<DemoEnrollmentResetResponse>(`${this.baseUrl}/admin/reset-enrollments`, {});
   }
 
   getWebSocketUrl(): string {

@@ -63,20 +63,6 @@ body {
   color: var(--app-accent);
 }
 
-.dev-info {
-  text-align: right;
-}
-
-.dev-info-label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--app-muted);
-  margin-bottom: 0.35rem;
-}
-
 .dev-links {
   display: flex;
   flex-wrap: wrap;
@@ -189,6 +175,12 @@ body {
   font-style: italic;
 }
 
+.reset-feedback {
+  margin: 0.65rem 0 0;
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
 // Folder-style tabs connected to content panel
 .demo-workspace {
   min-width: 0;
@@ -267,11 +259,6 @@ body {
 }
 
 @media (max-width: 576px) {
-  .dev-info {
-    text-align: left;
-    width: 100%;
-  }
-
   .dev-links {
     gap: 0.65rem;
   }

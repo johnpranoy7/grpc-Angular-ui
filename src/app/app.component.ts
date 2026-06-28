@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { DemoApiService } from './services/demo-api.service';
 
 @Component({
   selector: 'app-root',
@@ -61,7 +62,31 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
             <li><strong>Client streaming</strong> — many requests, one response</li>
             <li><strong>Bidirectional</strong> — many requests, many responses</li>
           </ul>
-          <p class="sidebar-hint">
+
+          <h3>Demo maintenance</h3>
+          <p class="sidebar-hint mb-2">
+            UI enrollments fill course seats over time. Reset removes demo-added rows
+            and keeps seed data. Auto-reset runs every 30 minutes on the server.
+          </p>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm w-100"
+            (click)="resetDemoData()"
+            [disabled]="resetting">
+            @if (resetting) {
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            } @else {
+              <i class="bi bi-arrow-counterclockwise me-1"></i>
+            }
+            Reset demo enrollments
+          </button>
+          @if (resetMessage) {
+            <p class="reset-feedback" [class.text-success]="resetSuccess" [class.text-danger]="!resetSuccess">
+              {{ resetMessage }}
+            </p>
+          }
+
+          <p class="sidebar-hint mt-3 mb-0">
             Select a tab to try each pattern live against the running backend.
           </p>
         </aside>
@@ -98,4 +123,28 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
     </div>
   `
 })
-export class AppComponent {}
+export class AppComponent {
+  resetting = false;
+  resetMessage: string | null = null;
+  resetSuccess = false;
+
+  constructor(private readonly api: DemoApiService) {}
+
+  resetDemoData(): void {
+    this.resetting = true;
+    this.resetMessage = null;
+
+    this.api.resetDemoEnrollments().subscribe({
+      next: result => {
+        this.resetSuccess = true;
+        this.resetMessage = result.message;
+        this.resetting = false;
+      },
+      error: err => {
+        this.resetSuccess = false;
+        this.resetMessage = err?.error?.message ?? err.message ?? 'Reset failed';
+        this.resetting = false;
+      }
+    });
+  }
+}
