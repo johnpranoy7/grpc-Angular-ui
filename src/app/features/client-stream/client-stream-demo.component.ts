@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
 import { DemoApiService, CatalogService } from '../../services/demo-api.service';
+import { enrollmentStatusBadge } from '../../utils/status-badge';
 import {
   BatchEnrollResponse,
   CourseSummary,
@@ -17,186 +13,116 @@ import {
 @Component({
   selector: 'app-client-stream-demo',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, FormsModule],
   template: `
-    <section class="demo-card">
-      <div class="demo-card-header">
-        <h2>Client Streaming — Batch Enroll</h2>
-        <p>Many requests, one summary response · <code>batchConsumeEnrollStudents</code></p>
+    <div class="card demo-panel">
+      <div class="card-header">
+        <h2 class="mb-0">Batch enrollment</h2>
+        <p class="text-secondary small mb-0 mt-1">Client streaming — <code>batchConsumeEnrollStudents</code></p>
       </div>
-      <div class="demo-card-body">
+      <div class="card-body">
         @for (row of rows; track $index; let i = $index) {
-          <div class="enroll-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Student</mat-label>
-              <mat-select [(ngModel)]="row.studentId">
-                @for (student of students; track student.studentId) {
-                  <mat-option [value]="student.studentId">
-                    {{ student.firstName }} {{ student.lastName }}
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Course</mat-label>
-              <mat-select [(ngModel)]="row.courseId">
-                @for (course of courses; track course.courseId) {
-                  <mat-option [value]="course.courseId">
-                    {{ course.courseName }} ({{ course.courseCode }})
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Term</mat-label>
-              <input matInput [(ngModel)]="row.term" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Grade</mat-label>
-              <input matInput type="number" step="0.1" [(ngModel)]="row.grade" />
-            </mat-form-field>
-
-            @if (rows.length > 1) {
-              <button mat-icon-button type="button" (click)="removeRow(i)" aria-label="Remove row">
-                <mat-icon>close</mat-icon>
-              </button>
-            }
-          </div>
+          <fieldset class="enroll-block">
+            <legend>Enrollment {{ i + 1 }}</legend>
+            <div class="row g-3 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label">Student</label>
+                <select class="form-select" [(ngModel)]="row.studentId">
+                  @for (student of students; track student.studentId) {
+                    <option [ngValue]="student.studentId">
+                      {{ student.firstName }} {{ student.lastName }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Course</label>
+                <select class="form-select" [(ngModel)]="row.courseId">
+                  @for (course of courses; track course.courseId) {
+                    <option [ngValue]="course.courseId">
+                      {{ course.courseName }} ({{ course.courseCode }})
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Term</label>
+                <input type="text" class="form-control" [(ngModel)]="row.term" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Grade</label>
+                <input type="number" step="0.1" class="form-control" [(ngModel)]="row.grade" />
+              </div>
+              @if (rows.length > 1) {
+                <div class="col-md-auto">
+                  <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeRow(i)" aria-label="Remove row">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </fieldset>
         }
 
-        <div class="actions">
-          <button mat-stroked-button (click)="addRow()">+ Add enrollment</button>
-          <button mat-flat-button color="primary" (click)="submitBatch()" [disabled]="loading">
-            Submit Batch
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="addRow()">
+            <i class="bi bi-plus-lg me-1"></i>Add enrollment
+          </button>
+          <button type="button" class="btn btn-primary" (click)="submitBatch()" [disabled]="loading">
+            @if (loading) {
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            }
+            Submit batch
           </button>
         </div>
 
         @if (error) {
-          <p class="error-text">{{ error }}</p>
+          <div class="alert alert-danger mt-3 mb-0 py-2" role="alert">{{ error }}</div>
         }
 
         @if (result) {
-          <div class="result-panel">
-            <div class="stat success-stat">
-              <span class="stat-value">{{ result.successCount }}</span>
-              <span class="stat-label">Succeeded</span>
+          <div class="result-stats">
+            <div class="stat-box success">
+              <span class="value">{{ result.successCount }}</span>
+              <span class="label">Succeeded</span>
             </div>
-            <div class="stat fail-stat">
-              <span class="stat-value">{{ result.failureCount }}</span>
-              <span class="stat-label">Failed</span>
+            <div class="stat-box fail">
+              <span class="value">{{ result.failureCount }}</span>
+              <span class="label">Failed</span>
             </div>
           </div>
 
           @if (result.failures?.length) {
-            <ul class="failure-list">
-              @for (failure of result.failures; track failure.studentId + '-' + failure.courseId) {
-                <li>
-                  <span class="status-chip" [class]="failure.reasonCode">{{ failure.reasonCode }}</span>
-                  <strong>{{ studentLabel(failure.studentId) }}</strong>
-                  → {{ courseLabel(failure.courseId) }}
-                  <p>{{ failure.message }}</p>
-                </li>
-              }
-            </ul>
+            <h4 class="h6 text-secondary mb-2">Rejected enrollments</h4>
+            <div class="table-responsive">
+              <table class="table demo-table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Reason</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (failure of result.failures; track failure.studentId + '-' + failure.courseId) {
+                    <tr>
+                      <td>{{ studentLabel(failure.studentId) }}</td>
+                      <td>{{ courseLabel(failure.courseId) }}</td>
+                      <td>
+                        <span class="badge" [class]="statusBadge(failure.reasonCode)">{{ failure.reasonCode }}</span>
+                      </td>
+                      <td class="small text-secondary">{{ failure.message }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           }
         }
       </div>
-    </section>
-  `,
-  styles: [`
-    .enroll-row {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(140px, 1fr)) auto;
-      gap: 0.75rem;
-      align-items: start;
-      margin-bottom: 0.75rem;
-      padding: 0.85rem;
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid var(--border);
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
-
-    .result-panel {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.25rem;
-    }
-
-    .stat {
-      flex: 1;
-      padding: 1rem;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .success-stat { background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.25); }
-    .fail-stat { background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); }
-
-    .stat-value {
-      display: block;
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .success-stat .stat-value { color: var(--success); }
-    .fail-stat .stat-value { color: var(--danger); }
-
-    .stat-label {
-      display: block;
-      margin-top: 0.35rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .failure-list {
-      list-style: none;
-      margin: 1rem 0 0;
-      padding: 0;
-    }
-
-    .failure-list li {
-      padding: 0.85rem;
-      margin-bottom: 0.5rem;
-      border-radius: 10px;
-      background: rgba(248, 113, 113, 0.08);
-      border: 1px solid rgba(248, 113, 113, 0.2);
-    }
-
-    .failure-list p {
-      margin: 0.35rem 0 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    code { color: #7dd3fc; font-size: 0.85em; }
-
-    @media (max-width: 900px) {
-      .enroll-row {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-  `]
+    </div>
+  `
 })
 export class ClientStreamDemoComponent implements OnInit {
   students: StudentSummary[] = [];
@@ -207,6 +133,8 @@ export class ClientStreamDemoComponent implements OnInit {
   loading = false;
   error: string | null = null;
   result: BatchEnrollResponse | null = null;
+
+  readonly statusBadge = enrollmentStatusBadge;
 
   constructor(
     private readonly api: DemoApiService,

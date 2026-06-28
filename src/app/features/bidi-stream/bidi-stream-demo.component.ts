@@ -1,10 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import {
   EnrollmentFeedback,
   EnrollmentIntent,
@@ -13,6 +9,7 @@ import {
   WebSocketControlMessage
 } from '../../models/demo.models';
 import { DemoApiService, CatalogService } from '../../services/demo-api.service';
+import { enrollmentStatusBadge } from '../../utils/status-badge';
 
 interface ChatMessage {
   direction: 'sent' | 'received';
@@ -23,141 +20,75 @@ interface ChatMessage {
 @Component({
   selector: 'app-bidi-stream-demo',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule
-  ],
+  imports: [CommonModule, FormsModule],
   template: `
-    <section class="demo-card">
-      <div class="demo-card-header">
-        <h2>Bidirectional — Live Advising</h2>
-        <p>Many ↔ many · <code>liveEnrollmentAdvising</code> via WebSocket</p>
+    <div class="card demo-panel">
+      <div class="card-header">
+        <h2 class="mb-0">Live enrollment advising</h2>
+        <p class="text-secondary small mb-0 mt-1">Bidirectional stream via WebSocket — <code>liveEnrollmentAdvising</code></p>
       </div>
-      <div class="demo-card-body">
-        <div class="session-bar">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
           @if (!connected) {
-            <button mat-flat-button color="primary" (click)="connect()">Connect session</button>
+            <button type="button" class="btn btn-primary" (click)="connect()">Connect session</button>
           } @else {
-            <button mat-stroked-button color="warn" (click)="disconnect()">Disconnect</button>
-            <span class="badge streaming">● Connected</span>
+            <button type="button" class="btn btn-outline-secondary" (click)="disconnect()">Disconnect</button>
+            <span class="badge rounded-pill status-live">● Connected</span>
           }
         </div>
 
-        <div class="intent-form">
-          <mat-form-field appearance="outline">
-            <mat-label>Student</mat-label>
-            <mat-select [(ngModel)]="intent.studentId">
-              @for (student of students; track student.studentId) {
-                <mat-option [value]="student.studentId">
-                  {{ student.firstName }} {{ student.lastName }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Course</mat-label>
-            <mat-select [(ngModel)]="intent.courseId">
-              @for (course of courses; track course.courseId) {
-                <mat-option [value]="course.courseId">
-                  {{ course.courseName }} ({{ course.courseCode }})
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Term</mat-label>
-            <input matInput [(ngModel)]="intent.term" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Grade</mat-label>
-            <input matInput type="number" step="0.1" [(ngModel)]="intent.grade" />
-          </mat-form-field>
-
-          <button mat-flat-button (click)="sendIntent()" [disabled]="!connected">Send intent</button>
-        </div>
+        <fieldset class="enroll-block mb-4" [disabled]="!connected">
+          <legend>Enrollment intent</legend>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">Student</label>
+              <select class="form-select" [(ngModel)]="intent.studentId">
+                @for (student of students; track student.studentId) {
+                  <option [ngValue]="student.studentId">
+                    {{ student.firstName }} {{ student.lastName }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Course</label>
+              <select class="form-select" [(ngModel)]="intent.courseId">
+                @for (course of courses; track course.courseId) {
+                  <option [ngValue]="course.courseId">
+                    {{ course.courseName }} ({{ course.courseCode }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Term</label>
+              <input type="text" class="form-control" [(ngModel)]="intent.term" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Grade</label>
+              <input type="number" step="0.1" class="form-control" [(ngModel)]="intent.grade" />
+            </div>
+            <div class="col-md-auto">
+              <button type="button" class="btn btn-primary" (click)="sendIntent()" [disabled]="!connected">Send intent</button>
+            </div>
+          </div>
+        </fieldset>
 
         <div class="chat-panel">
           @for (msg of messages; track $index) {
-            <div [class]="'bubble ' + msg.direction">
+            <div class="chat-bubble" [class.sent]="msg.direction === 'sent'" [class.received]="msg.direction === 'received'">
               @if (msg.status) {
-                <span class="status-chip" [class]="msg.status">{{ msg.status }}</span>
+                <span class="badge d-inline-block mb-1" [class]="statusBadge(msg.status)">{{ msg.status }}</span><br>
               }
-              <span>{{ msg.text }}</span>
+              {{ msg.text }}
             </div>
           } @empty {
             <p class="chat-empty">Connect and send an enrollment intent to see live advisor feedback.</p>
           }
         </div>
       </div>
-    </section>
-  `,
-  styles: [`
-    .session-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .intent-form {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 0.75rem;
-      align-items: start;
-      margin-bottom: 1.25rem;
-      padding: 1rem;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid var(--border);
-    }
-
-    .chat-panel {
-      max-height: 380px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      background: rgba(15, 23, 42, 0.6);
-    }
-
-    .chat-empty {
-      margin: 0;
-      color: var(--muted);
-      text-align: center;
-      font-style: italic;
-      padding: 2rem 1rem;
-    }
-
-    .bubble {
-      margin-bottom: 0.75rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      max-width: 88%;
-      line-height: 1.45;
-      font-size: 0.92rem;
-    }
-
-    .bubble.sent {
-      margin-left: auto;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(99, 102, 241, 0.25));
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      text-align: right;
-    }
-
-    .bubble.received {
-      background: var(--surface-elevated);
-      border: 1px solid var(--border);
-    }
-
-    code { color: #7dd3fc; font-size: 0.85em; }
-  `]
+    </div>
+  `
 })
 export class BidiStreamDemoComponent implements OnInit, OnDestroy {
   connected = false;
@@ -171,6 +102,8 @@ export class BidiStreamDemoComponent implements OnInit, OnDestroy {
     status: 'Enrolled',
     grade: 3.5
   };
+
+  readonly statusBadge = enrollmentStatusBadge;
 
   private socket?: WebSocket;
 
@@ -205,7 +138,7 @@ export class BidiStreamDemoComponent implements OnInit, OnDestroy {
     };
 
     this.socket.onerror = () => {
-      this.messages.push({ direction: 'received', text: 'WebSocket error' });
+      this.messages.push({ direction: 'received', text: 'WebSocket error.' });
     };
 
     this.socket.onclose = () => {
@@ -245,7 +178,7 @@ export class BidiStreamDemoComponent implements OnInit, OnDestroy {
     const courseName = this.catalog.courseLabel(feedback.courseId, this.courses);
     let text = feedback.message;
     if (feedback.persisted) {
-      text += ` · Projected GPA: ${feedback.projectedGpa}`;
+      text += ` (projected GPA: ${feedback.projectedGpa})`;
     }
     text = `${studentName} · ${courseName}: ${text}`;
     this.messages.push({ direction: 'received', text, status: feedback.status });

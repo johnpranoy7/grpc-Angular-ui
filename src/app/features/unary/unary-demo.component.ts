@@ -1,169 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DemoApiService, CatalogService } from '../../services/demo-api.service';
 import { StudentProfile, StudentSummary } from '../../models/demo.models';
 
 @Component({
   selector: 'app-unary-demo',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [CommonModule, FormsModule],
   template: `
-    <section class="demo-card">
-      <div class="demo-card-header">
-        <h2>Unary — Student Profile</h2>
-        <p>One request, one response · <code>getStudentProfile</code></p>
+    <div class="card demo-panel">
+      <div class="card-header">
+        <h2 class="mb-0">Student profile lookup</h2>
+        <p class="text-secondary small mb-0 mt-1">Unary RPC — <code>getStudentProfile</code></p>
       </div>
-      <div class="demo-card-body">
-        <div class="controls">
-          <mat-form-field appearance="outline">
-            <mat-label>Select student</mat-label>
-            <mat-select [(ngModel)]="studentId">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6 col-lg-5">
+            <label for="studentSelect" class="form-label">Student</label>
+            <select id="studentSelect" class="form-select" [(ngModel)]="studentId">
               @for (student of students; track student.studentId) {
-                <mat-option [value]="student.studentId">
-                  {{ student.firstName }} {{ student.lastName }} · {{ student.program }}
-                </mat-option>
+                <option [ngValue]="student.studentId">
+                  {{ student.firstName }} {{ student.lastName }} — {{ student.program }}
+                </option>
               }
-            </mat-select>
-          </mat-form-field>
-
-          <button mat-flat-button color="primary" (click)="fetchProfile()" [disabled]="loading || !studentId">
-            Fetch Profile
-          </button>
+            </select>
+          </div>
+          <div class="col-md-auto">
+            <button type="button" class="btn btn-primary" (click)="fetchProfile()" [disabled]="loading || !studentId">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+              }
+              Fetch profile
+            </button>
+          </div>
         </div>
 
-        @if (loading) {
-          <mat-spinner diameter="36"></mat-spinner>
-        }
-
         @if (error) {
-          <p class="error-text">{{ error }}</p>
+          <div class="alert alert-danger mt-3 mb-0 py-2" role="alert">{{ error }}</div>
         }
 
         @if (profile) {
-          <div class="profile-card">
-            <div class="profile-header">
-              <div class="avatar">{{ profile.firstName.charAt(0) }}{{ profile.lastName.charAt(0) }}</div>
+          <div class="profile-result">
+            <div class="profile-hero">
+              <div class="profile-avatar">{{ profile.firstName.charAt(0) }}{{ profile.lastName.charAt(0) }}</div>
               <div>
                 <h3>{{ profile.firstName }} {{ profile.lastName }}</h3>
-                <p>{{ profile.email }}</p>
+                <p class="email">{{ profile.email }}</p>
               </div>
-              <span class="gpa-pill">GPA {{ profile.gpa }}</span>
+              <span class="gpa-badge">GPA {{ profile.gpa }}</span>
             </div>
-            <div class="profile-grid">
-              <div><span>Program</span><strong>{{ profile.program }}</strong></div>
-              <div><span>Semester</span><strong>{{ profile.currentSemester }}</strong></div>
-              <div><span>Enrollments</span><strong>{{ profile.enrolledCourses.length }}</strong></div>
-            </div>
+
+            <dl class="stat-pills mb-3">
+              <div class="stat-pill">
+                <dt>Program</dt>
+                <dd>{{ profile.program }}</dd>
+              </div>
+              <div class="stat-pill">
+                <dt>Semester</dt>
+                <dd>{{ profile.currentSemester }}</dd>
+              </div>
+              <div class="stat-pill">
+                <dt>Enrollments</dt>
+                <dd>{{ profile.enrolledCourses.length }}</dd>
+              </div>
+            </dl>
+
             @if (profile.enrolledCourses.length) {
-              <ul class="enrollment-list">
-                @for (course of profile.enrolledCourses; track course.courseId + course.term) {
-                  <li>
-                    <strong>{{ course.courseName }}</strong>
-                    <span>{{ course.term }} · {{ course.status }} · Grade {{ course.grade }}</span>
-                  </li>
-                }
-              </ul>
+              <div class="table-responsive">
+                <table class="table demo-table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th>Term</th>
+                      <th>Status</th>
+                      <th>Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (course of profile.enrolledCourses; track course.courseId + course.term) {
+                      <tr>
+                        <td>{{ course.courseName }}</td>
+                        <td>{{ course.term }}</td>
+                        <td>{{ course.status }}</td>
+                        <td>{{ course.grade }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="text-secondary small mb-0">No enrollments on record.</p>
             }
           </div>
         }
       </div>
-    </section>
-  `,
-  styles: [`
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    mat-form-field { max-width: 360px; }
-    mat-spinner { margin-top: 1rem; }
-
-    .profile-card {
-      margin-top: 1.25rem;
-      padding: 1.25rem;
-      border-radius: 12px;
-      background: var(--surface-elevated);
-      border: 1px solid var(--border);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      font-weight: 700;
-      color: white;
-    }
-
-    .profile-header h3 { margin: 0; color: #f8fafc; }
-    .profile-header p { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.9rem; }
-    .gpa-pill {
-      margin-left: auto;
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      background: rgba(74, 222, 128, 0.15);
-      color: var(--success);
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-
-    .profile-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .profile-grid span {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .enrollment-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .enrollment-list li {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.65rem 0;
-      border-top: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-
-    .enrollment-list span { color: var(--muted); }
-    code { color: #7dd3fc; font-size: 0.85em; }
-  `]
+    </div>
+  `
 })
 export class UnaryDemoComponent implements OnInit {
   students: StudentSummary[] = [];
