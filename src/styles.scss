@@ -1,0 +1,118 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
+  background: linear-gradient(160deg, #0f172a 0%, #1e293b 45%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+:root {
+  --surface: rgba(30, 41, 59, 0.85);
+  --surface-elevated: rgba(51, 65, 85, 0.9);
+  --border: rgba(148, 163, 184, 0.2);
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.15);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --muted: #94a3b8;
+  --radius: 14px;
+}
+
+.demo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.demo-card-header {
+  padding: 1.5rem 1.5rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.demo-card-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.demo-card-header p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.demo-card-body {
+  padding: 1.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge.streaming { background: var(--accent-soft); color: var(--accent); }
+.badge.done { background: rgba(74, 222, 128, 0.15); color: var(--success); }
+.badge.error { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+
+.status-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.status-chip.APPROVED,
+.status-chip.success { background: rgba(74, 222, 128, 0.2); color: var(--success); }
+.status-chip.GPA_WARNING,
+.status-chip.warning { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+.status-chip.ALREADY_ENROLLED,
+.status-chip.COURSE_FULL,
+.status-chip.STUDENT_NOT_FOUND,
+.status-chip.COURSE_NOT_FOUND,
+.status-chip.INVALID_TERM,
+.status-chip.ERROR,
+.status-chip.danger { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+
+.error-text { color: var(--danger); margin-top: 1rem; }
+.success-text { color: var(--success); margin-top: 1rem; }
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-card {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: #0ea5e9;
+}
+
+.mat-mdc-outlined-button {
+  --mdc-outlined-button-outline-color: var(--border);
+  --mdc-outlined-button-label-text-color: #e2e8f0;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-label-text-color: #94a3b8;
+  --mdc-outlined-text-field-input-text-color: #f1f5f9;
+  --mdc-outlined-text-field-outline-color: var(--border);
+  --mat-select-enabled-trigger-text-color: #f1f5f9;
+}
