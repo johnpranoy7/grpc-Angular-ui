@@ -43,15 +43,15 @@ import { DemoApiService } from './services/demo-api.service';
           <ul class="app-stack">
             <li>
               <strong>grpc-server</strong>
-              <span>Spring Boot gRPC service · port 9090 · JPA + H2</span>
+              <span>Spring Boot gRPC service · JPA + H2</span>
             </li>
             <li>
               <strong>grpc-client</strong>
-              <span>BFF bridging HTTP/SSE/WebSocket → gRPC · port 8080</span>
+              <span>BFF bridging HTTP/SSE/WebSocket → gRPC</span>
             </li>
             <li>
               <strong>grpc-demo-ui</strong>
-              <span>This Angular app · port 4200</span>
+              <span>This Angular app</span>
             </li>
           </ul>
 
