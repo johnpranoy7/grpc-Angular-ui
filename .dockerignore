@@ -1,0 +1,7 @@
+node_modules
+dist
+.angular
+.git
+.github
+README.md
+npm-debug.log
