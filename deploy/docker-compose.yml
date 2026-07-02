@@ -9,7 +9,8 @@ services:
       - grpc-net
     expose:
       - "9090"
-      - "9091"
+    ports:
+      - "8072:9091"
 
   grpc-client:
     image: johnpranoy7/grpc-client:latest
