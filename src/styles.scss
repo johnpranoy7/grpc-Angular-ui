@@ -223,6 +223,178 @@ body {
   min-width: 0;
 }
 
+// gRPC primer + pattern diagram
+.grpc-primer {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+}
+
+.grpc-primer > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.grpc-primer > summary::-webkit-details-marker {
+  display: none;
+}
+
+.primer-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.primer-title .bi {
+  color: var(--app-accent);
+  margin-right: 0.25rem;
+}
+
+.grpc-primer .chevron {
+  color: var(--app-muted);
+  transition: transform 0.2s ease;
+}
+
+.grpc-primer[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.grpc-primer-body {
+  padding: 0 1.1rem 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--app-muted);
+}
+
+.primer-lead {
+  margin: 0 0 0.85rem;
+}
+
+.primer-lead strong {
+  color: var(--app-text);
+}
+
+.why-grpc {
+  padding: 0.75rem 0.9rem;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  margin-bottom: 1.1rem;
+}
+
+.why-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--app-accent);
+  margin-bottom: 0.4rem;
+}
+
+.why-grpc ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.why-grpc li {
+  margin-bottom: 0.3rem;
+}
+
+.why-grpc strong {
+  color: var(--app-text);
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+.pattern-card {
+  padding: 0.75rem 0.85rem 0.5rem;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+}
+
+.pattern-head {
+  margin-bottom: 0.35rem;
+}
+
+.pattern-name {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.pattern-sub {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--app-muted);
+}
+
+.pattern-svg {
+  width: 100%;
+  height: auto;
+}
+
+.pattern-svg .node {
+  fill: rgba(15, 23, 42, 0.7);
+  stroke: var(--app-border);
+  stroke-width: 1;
+}
+
+.pattern-svg .node-label {
+  fill: var(--app-text);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  font-family: var(--bs-font-monospace);
+}
+
+.pattern-svg .req {
+  stroke: var(--app-accent);
+  stroke-width: 2;
+}
+
+.pattern-svg .res {
+  stroke: var(--app-success);
+  stroke-width: 2;
+}
+
+.primer-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--app-accent);
+  text-decoration: none;
+  transition: gap 0.15s;
+}
+
+.primer-more:hover {
+  gap: 0.55rem;
+  text-decoration: underline;
+}
+
 .folder-tabs {
   display: flex;
   flex-wrap: wrap;
