@@ -54,6 +54,22 @@ body {
   letter-spacing: -0.02em;
 }
 
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--app-muted);
+  text-decoration: none;
+  transition: color 0.15s, gap 0.15s;
+}
+
+.back-link:hover {
+  color: var(--app-accent);
+  gap: 0.5rem;
+}
+
 .app-eyebrow {
   margin: 0;
   font-size: 0.7rem;
@@ -103,6 +119,27 @@ body {
   color: var(--app-muted);
   position: sticky;
   top: 1rem;
+}
+
+.all-projects-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--app-accent);
+  text-decoration: none;
+  background: var(--app-accent-soft);
+  border: 1px solid var(--app-accent-glow);
+  border-radius: 6px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.all-projects-link:hover {
+  background: rgba(79, 156, 249, 0.18);
+  border-color: var(--app-accent);
 }
 
 .project-sidebar h2 {

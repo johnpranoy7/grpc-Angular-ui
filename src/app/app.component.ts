@@ -11,6 +11,9 @@ import { DemoApiService } from './services/demo-api.service';
       <header class="top-bar">
         <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div>
+            <a class="back-link mb-2" href="https://johnpranoy7.dev/projects/grpc-microservices/" target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-arrow-left"></i> Back to project info
+            </a>
             <p class="app-eyebrow mb-1">Student enrollment domain · Spring Boot · Angular</p>
             <h1 class="top-title mb-0">gRPC Communication Patterns Demo</h1>
           </div>
@@ -33,6 +36,9 @@ import { DemoApiService } from './services/demo-api.service';
 
       <div class="container workspace">
         <aside class="project-sidebar">
+          <a class="all-projects-link" href="https://johnpranoy7.dev/projects/" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-grid-1x2"></i> All projects
+          </a>
           <h2>About this project</h2>
           <p>
             A hands-on demo built to understand <strong>gRPC</strong> and its four
